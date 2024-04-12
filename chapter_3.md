@@ -54,7 +54,8 @@ bat ex/3_2.txt
 rg '[Rr]eg[Ee]x' ex/3_2.txt
 ```
 
-물론 이 방식은 `REGEX`과 같은 것을 찾을 수 었습니다.
+물론 이 방식은 `REGEX`과 같은 것을 찾을 수 있었습니다.
+
 ```txt
 RegEx
 regex
