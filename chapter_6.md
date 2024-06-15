@@ -137,3 +137,172 @@ rg 'at\B' ex/6_5.txt
 ```
 
 이번에는 `athens`, `atom`, `attorney` 안에있는 `at`에만 일치하게 됩니다. 즉 `at`으로 시작해서 `\w`과 일치하는 것이 나오는 것을 찾습니다.
+
+## 문자열 경계 정의하기
+
+문자열의 경계는 전체 문자열의 시작이나 마지막 부분과 패턴을 일치시키고자 할 때 사용한다. 문자열 경계는 메타 문자 가운데 케럿(`^`)으로 문자열의 시작을 달러 기호(`$`)로 문자열의 마지막을 나타낸다.
+
+참고: 케럿(`^`) 문자는 대괄호(`[,]`)로 둘러싸인 집합 안에서는 여는 대괄호(`[`) 문자 바로 다음에 쓰면 부정을 뜻한다. 그러나 이 집합 밖에서는 패턴 시작에서 케럿(`^`) 문자를 사용하면 이는 문자열 시작을 뜻한다.
+
+이제 아래 예제를 살펴 봅시다.
+
+```xml
+<?xml version="1.0" encodingi"UTF-8" ?>
+‹wsdl:definitions targetNamespace="http://tips.cf"
+xmlns: impl="http://tips.cf" xmlns: intf="http://tips.cf"
+xm1ns: apachesoap="http://xml.apache.org/xml-soap"
+```
+
+이것은 `ex/6_6.txt`에 들어 있습니다. 다음과 같이 확인하면 됩니다.
+
+```bash
+bat ex/6_6.txt
+```
+
+이것이 `XML` 형식의 문서인지 아닌지를 검사하는 패턴을 만들어 봅시다. 올바른 `XML` 문서는 `<？xml`으로 시작하고 부가 속성을 포함한 다음, `?>`으로 끝납니다.
+
+다음을 실행해 봅시다.
+
+```bash
+rg '<\?xml.*\?>' ex/6_6.txt
+```
+
+이것은 `<\?xml`은 `<\xml`과 일치하고. `\?>`은 `?>`과 일치하고 `.*`은 앞 둘 사이에 모든 글자, 즉 `.`이 여러개, 즉 `*`이 있는 패턴을 찾습니다.
+
+실행 결과는 다음과 같습니다.
+
+```bash
+rg '<\?xml.*\?>' ex/6_6.txt
+
+1:<?xml version="1.0" encodingi"UTF-8" ?>
+```
+
+적절하게 필요한 것을 찾는 것 같습니다. 그러나 다음과 같이 찾고자 하는 것이 2번째 줄에 있는 경우에는 문제가 발생할 수 있습니다.
+
+```xml
+This is bad, real bad!
+<?xml version="1.0" encodingi"UTF-8" ?>
+‹wsdl:definitions targetNamespace="http://tips.cf"
+xmlns: impl="http://tips.cf" xmlns: intf="http://tips.cf"
+xm1ns: apachesoap="http://xml.apache.org/xml-soap"
+```
+
+이것은 `ex/6_7.txt`에 들어 있습니다. 다음과 같이 확인하면 됩니다.
+
+```bash
+bat ex/6_7.txt
+```
+
+이 경우에도 위와 동일한 문자열을 찾아냅니다.
+
+```bash
+rg '<\?xml.*\?>' ex/6_7.txt
+
+2:<?xml version="1.0" encodingi"UTF-8" ?>
+```
+
+그러나 문제는 이것이 2번째 줄에 있는 것을 찾아낸 것입니다. 우리는 지금 찾은 문자열이 첫 번째 줄에 들어 있는지를 알고 싶습니다. 이럴 때 필요한 것이 케럿(`^`) 문자입니다.
+
+```bash
+rg '^\s*<\?xml.*\?>' ex/6_6.txt
+
+1:<?xml version="1.0" encodingi"UTF-8" ?>
+```
+
+조심할 점은 지금 여기서 사용하고 있는 `rg`, 즉 `ripgrep`은 입력된 텍스트의 줄마다 검사를 합니다. 아래 내용 참고
+
+> ripgrep is a line-oriented search tool that recursively searches the current directory for a regex pattern.
+
+그러므로 정확하게 찾으려면 `python`의 `re`을 사용해야 합니다. 앞의 패턴을 사용하기 위해서는 다음과 같이 하면 됩니다.
+
+```python
+import re
+pattern = re.compile("^\s*<\?xml.*\?>")
+pattern.search(temp)
+```
+
+그러면 이것을 "ex/6_6.txt"과 "ex/6_7.txt"에 적용해봅시다.
+
+```python
+import re
+
+with open("ex/6_6.txt") as my_file:
+    temp = my_file.read()
+    pattern = re.compile("^\s*<\?xml.*\?>")
+    pattern.search(temp)  
+```
+
+다음은 실행 결과 입니다.
+
+```python
+>>> import re
+>>> 
+>>> with open("ex/6_6.txt") as my_file:
+...     temp = my_file.read()
+...     pattern = re.compile("^\s*<\?xml.*\?>")
+...     pattern.search(temp)  
+... 
+<re.Match object; span=(0, 39), match='<?xml version="1.0" encodingi"UTF-8" ?>'>
+```
+
+"ex/6_6.txt"에는 맨 앞 줄에 있는 것을 확인할 수 있습니다.
+
+```python
+import re
+
+with open("ex/6_7.txt") as my_file:
+    temp = my_file.read()
+    pattern = re.compile("^\s*<\?xml.*\?>")
+    pattern.search(temp)  
+```
+
+다음은 실행 결과 입니다.
+
+```python
+>>> import re
+>>> 
+>>> with open("ex/6_7.txt") as my_file:
+...     temp = my_file.read()
+...     pattern = re.compile("^\s*<\?xml.*\?>")
+...     pattern.search(temp)  
+... 
+>>> 
+```
+
+"ex/6_7.txt"에서는 아무런 결과가 나오지 않고 있습니다. 즉 맨 앞 줄에 우리가 찾고자 하는 것이 없다는 것을 확인할 수 있습니다.
+
+## 다중행 모드를 사용하기
+
+대개 케럿(`^`)은 문자열의 시작과 일치하고, 달러 기호(`$`)로 문자열의 마지막과 일치합니다. 예외적으로 이 두 메타 문자의 동작을 바꾸는 방법이 있습니다. `(?m)`을 사용하면 다중행(multiline)을 지원하게 됩니다. 다중행 모드로 변경하면 강제로 정규 표현식 엔진이 줄바꿈 문자를 문자열 구분자로 인식합니다. 케럿(`^`)은 문자열의 시작 또는 줄바꿈 다음(새로운 행)에 나오는 문자열 시작과 일치하고, 달러 기호(`$`)로 문자열의 마지막과 줄바꿈 다음에 나오는 문자열의 마지막과 일치하게 됩니다. 앞에서 우리가 사용했던 `rg`, 즉 `ripgrep`과 같이 작동하게 됩니다. 만약 `python`에서 이를 적용해 봅시다.
+
+```python
+import re
+
+with open("ex/6_7.txt") as my_file:
+    temp = my_file.read()
+    pattern = re.compile("(?m)^\s*<\?xml.*\?>")
+    pattern.search(temp)  
+```
+
+실행 결과는 다음과 같습니다.
+
+```python
+>>> import re
+>>> 
+>>> with open("ex/6_7.txt") as my_file:
+...     temp = my_file.read()
+...     pattern = re.compile("(?m)^\s*<\?xml.*\?>")
+...     pattern.search(temp)  
+... 
+<re.Match object; span=(23, 62), match='<?xml version="1.0" encodingi"UTF-8" ?>'>
+```
+
+앞에서 `(?m)`을 사용하지 않은 것과 확실하게 다르게 동작합니다. 여기서는 2번째 줄에 있다는 것을 찾고 있습니다.
+
+**Note**: 어떤 정규 표현식은 케럿 기호(`^`)은 `\A`로, 달러 기호(`$`)은 `\Z`로 바꿔 사용할 수 있습니다. 이렇게 바꿔 사용할 경우에는 `(?m)`이 작동하지 않습니다.
+
+## 정리해 보자
+
+- `\b`: 단어의 경계를 지정, `\B`은 반대
+- `^`: 문자열 시작
+- `$`: 문자열 끝
