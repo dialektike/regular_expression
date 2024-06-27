@@ -21,13 +21,22 @@ bat ex/2_1.txt
 rg Ben ex/2_1.txt
 ```
 
+참고로 `rg`과 `grep`은 정규표현식을 사용하기 위한 명령어 입니다. `rg`은 `ripgrep`를 사용하기 위한 명령어입니다.
+
+```bash
+grep Ben ex/2_1.txt
+```
+
 `my`이라는 단어를 찾아 봅니다.
 
 - 정규 표현식: `my`
 
 ```bash
 rg my ex/2_1.txt  
-1:Hello, my name is Ben. Please visit 
+```
+
+```bash
+grep Ben ex/2_1.txt
 ```
 
 일반적으로 일치하는 단어 하나만 보여주는 경우도 있지만, 위의 `rg my ex/2_1.txt`을 실행하면 `ex/2_1.txt`에 들어 있는 모든 일치하는 것을, 즉 `my`을 모두 보여줍니다.
