@@ -7,3 +7,5 @@
 
 - `bat`: <https://github.com/sharkdp/bat>
 - `ripgrep`: <https://github.com/BurntSushi/ripgrep>
+
+참고로 `ripgrep`은 줄 단위로 정규표현식을 적용하지만, `grep`은 기본적으로 전체 단위로 처리합니다.
