@@ -177,6 +177,12 @@ rg '<\?xml.*\?>' ex/6_6.txt
 1:<?xml version="1.0" encodingi"UTF-8" ?>
 ```
 
+`grep`로도 가능합니다.
+
+```bash
+grep '^\s*<\?xml.*\?>' ex/6_6.txt -E
+```
+
 적절하게 필요한 것을 찾는 것 같습니다. 그러나 다음과 같이 찾고자 하는 것이 2번째 줄에 있는 경우에는 문제가 발생할 수 있습니다.
 
 ```xml
@@ -201,7 +207,7 @@ rg '<\?xml.*\?>' ex/6_7.txt
 2:<?xml version="1.0" encodingi"UTF-8" ?>
 ```
 
-그러나 문제는 이것이 2번째 줄에 있는 것을 찾아낸 것입니다. 우리는 지금 찾은 문자열이 첫 번째 줄에 들어 있는지를 알고 싶습니다. 이럴 때 필요한 것이 케럿(`^`) 문자입니다.
+그러나 이 패턴의 문제는 이것이 2번째 줄에 있는 것을 찾아낸 것입니다. 지금 우리는 찾은 문자열이 첫 번째 줄에 들어 있는지를 알고 싶습니다. 2번째 줄에 있는 것을 찾고 싶지 않습니다. 이럴 때 필요한 것이 케럿(`^`) 문자입니다.
 
 ```bash
 rg '^\s*<\?xml.*\?>' ex/6_6.txt
@@ -209,7 +215,15 @@ rg '^\s*<\?xml.*\?>' ex/6_6.txt
 1:<?xml version="1.0" encodingi"UTF-8" ?>
 ```
 
-조심할 점은 지금 여기서 사용하고 있는 `rg`, 즉 `ripgrep`은 입력된 텍스트의 줄마다 검사를 합니다. 아래 내용 참고
+그러나 아쉽게도 이 케럿(`^`) 문자가 `rg`에서는 적절하게 작동하지 않습니다.
+
+```bash
+rg '^\s*<\?xml.*\?>' ex/6_7.txt
+
+2:<?xml version="1.0" encodingi"UTF-8" ?>
+```
+
+앞에서와 같은 결과를 보여줍니다. 왜냐하면 지금 여기서 사용하고 있는 `rg`, 즉 `ripgrep`은 입력된 텍스트의 줄마다 검사를 하기 때문입니다. 아래 내용 참고
 
 > ripgrep is a line-oriented search tool that recursively searches the current directory for a regex pattern.
 
